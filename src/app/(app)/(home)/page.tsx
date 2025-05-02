@@ -1,6 +1,13 @@
+"use client"
 
-export default async function Home() {
+import { useQuery } from '@tanstack/react-query';
+import { useTRPC } from '@/trpc/client';
 
+export default  function Home() {
 
-  return <div></div>;
+  const trpc = useTRPC();
+  const categories = useQuery(trpc.categories.getMany.queryOptions());
+  return (<div>
+    Home page
+  </div>);
 }
