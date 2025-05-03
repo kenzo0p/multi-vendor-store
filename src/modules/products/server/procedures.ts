@@ -7,23 +7,26 @@ export const productsRouter = createTRPCRouter({
     .input(
       z.object({
         category: z.string().nullable().optional(),
-        minPrize: z.string().nullable().optional(),
-        maxPrize: z.string().nullable().optional(),
+        minPrice: z.string().nullable().optional(),
+        maxPrice: z.string().nullable().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const where: Where = {};
-      if (input.minPrize) {
+      const where: Where = {  };
+
+      if (input.minPrice && input.maxPrice) {
         where.price = {
-          ...where.price,
-          greater_than_equal: input.minPrize,
+          greater_than_equal: input.minPrice,
+          less_than_equal: input.maxPrice,
         };
-      }
-      if (input.maxPrize) {
+      }else if (input.minPrice){
         where.price = {
-          ...where.price,
-          greater_than_equal: input.maxPrize,
-        };
+          greater_than_equal : input.minPrice,
+        }
+      }else if(input.maxPrice){
+        where.price = {
+          less_than_equal  :input.maxPrice,
+        }
       }
       if (input.category) {
         const categoriesData = await ctx.db.find({
