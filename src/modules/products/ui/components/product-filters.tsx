@@ -5,6 +5,7 @@ import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
 import { PriceFilter } from "./price-filter";
 import { useProductFilter } from "../../hooks/useProductFilter";
+import TagsFilter from "./tags-filter";
 
 interface ProductFilterProps {
   title: string;
@@ -19,42 +20,65 @@ export const ProductFilter = ({
   const [isOpen, setIsOpen] = useState(false);
   const Icon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
-  return <div className={cn("p-4 border-b flex flex-col gap-2" , className)}>
-    <div onClick={() => setIsOpen((current) => !current)} className="flex items-center justify-between cursor-pointer">
+  return (
+    <div className={cn("p-4 border-b flex flex-col gap-2", className)}>
+      <div
+        onClick={() => setIsOpen((current) => !current)}
+        className="flex items-center justify-between cursor-pointer"
+      >
         <p className="font-medium">{title}</p>
-        <Icon className="size-5"/>
+        <Icon className="size-5" />
+      </div>
+      {isOpen && children}
     </div>
-    {isOpen && children}
-  </div>;
+  );
 };
 
 export const ProductFilters = () => {
-    const [filters, setFilters] = useProductFilter()
-    const onChange = (key : keyof typeof filters , value :unknown  ) =>{
-        setFilters({...filters , [key] : value});
-    };
+  const [filters, setFilters] = useProductFilter();
+  const onChange = (key: keyof typeof filters, value: unknown) => {
+    setFilters({ ...filters, [key]: value });
+  };
 
+  const onClear = () => {
+    setFilters({ minPrice: "", maxPrice: "", tags: [] });
+  };
 
-
+  const hasAnyFilter = Object.entries(filters).some(([key, value]) => {
+    if (key === "sort") return false;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === "string") {
+      return value !== "";
+    }
+    return value !== null;
+  });
 
   return (
     <div className="border rounded-md bg-white">
       <div className="p-4 border-b flex items-center justify-between">
         <p className="font-medium">Filters</p>
-        <button
-          className="underline cursor-pointer"
-          onClick={() => {}}
-          type="button"
-        >
-          Clear
-        </button>
+        {hasAnyFilter && (
+          <button
+            className="underline cursor-pointer"
+            onClick={onClear}
+            type="button"
+          >
+            Clear
+          </button>
+        )}
       </div>
-      <ProductFilter title="Price" className="border-b-0">
+      <ProductFilter title="Price">
         <PriceFilter
-            maxPrice={filters.maxPrice}
-            minPrice={filters.minPrice}
-            onMaxPriceChange={(value) => onChange("maxPrice" , value)}
-            onMinPriceChange={(value) => onChange("minPrice" , value)}
+          maxPrice={filters.maxPrice}
+          minPrice={filters.minPrice}
+          onMaxPriceChange={(value) => onChange("maxPrice", value)}
+          onMinPriceChange={(value) => onChange("minPrice", value)}
+        />
+      </ProductFilter>
+      <ProductFilter title="Tags" className="border-b-0">
+        <TagsFilter
+          value={filters.tags}
+          onChange={(value) => onChange("tags", value)}
         />
       </ProductFilter>
     </div>
