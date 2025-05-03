@@ -9,8 +9,7 @@ import { useState } from "react";
 import { MenuIcon } from "lucide-react";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar } from "@/components/ui/avatar";
-import { AvatarFallback } from "@radix-ui/react-avatar";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
