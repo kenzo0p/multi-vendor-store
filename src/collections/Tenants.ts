@@ -32,7 +32,7 @@ export const Tenants: CollectionConfig = {
       relationTo: "media",
     },
     {
-      name: "stripeAcccountId",
+      name: "stripeAccountId",
       type: "text",
       required: true,
       admin: {
