@@ -1,6 +1,5 @@
 "use client";
 
-// TODO:Add real ratings
 import { StarRating } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
@@ -8,10 +7,11 @@ import { Progress } from "@/components/ui/progress";
 import { formatCurrency, generateTenantUrl } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { LinkIcon, StarIcon } from "lucide-react";
+import { CheckCheckIcon, LinkIcon, StarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
+import { toast } from "sonner";
 // import { CartButton } from "../components/cart-button";
 
 //Now I dont have worry about the hydration errors as now its client side not ssr
@@ -28,10 +28,12 @@ interface ProductViewProps {
 }
 
 const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
+  const [isCopied, setIsCopied] = useState(false);
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
     trpc.products.getOne.queryOptions({ id: productId })
   );
+
   return (
     <div className="px-4 lg:px-12 py-10">
       <div className="border rounded-sm bg-white overflow-hidden">
@@ -76,16 +78,24 @@ const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                 </Link>
               </div>
               <div className="hidden lg:flex px-6 py-4 items-center justify-center">
-                <div className="flex items-center gap-1">
-                  <StarRating rating={4} iconClassName="size-4" />
+                <div className="flex items-center gap-2">
+                  <StarRating
+                    rating={data.reviewRating}
+                    iconClassName="size-4"
+                  />
+                  <p className="text-base font-medium">
+                    {data.reviewCount} ratings
+                  </p>
                 </div>
               </div>
             </div>
             {/* Mobile block */}
             <div className="block lg:hidden px-6 py-4 items-center justify-center border-b">
-              <div className="flex items-center gap-1">
-                <StarRating rating={4} iconClassName="size-4" />
-                <p className="text-base font-medium">{5} ratings</p>
+              <div className="flex items-center gap-2">
+                <StarRating rating={data.reviewRating} iconClassName="size-4" />
+                <p className="text-base font-medium">
+                  {data.reviewCount} ratings
+                </p>
               </div>
             </div>
 
@@ -113,10 +123,17 @@ const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                   <Button
                     className="size-12"
                     variant={"elevated"}
-                    onClick={() => {}}
-                    disabled={false}
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      setIsCopied(true);
+                      toast.success("Url Copied to clipboard");
+                      setTimeout(() => {
+                        setIsCopied(true);
+                      }, 1000);
+                    }}
+                    disabled={isCopied}
                   >
-                    <LinkIcon />
+                    {isCopied ? <CheckCheckIcon /> : <LinkIcon />}
                   </Button>
                 </div>
                 <p className="text-center font-medium">
@@ -130,8 +147,8 @@ const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                   <h3 className="text-xl font-medium">Ratings</h3>
                   <div className="flex items-center gap-x-1 font-medium">
                     <StarIcon className="size-4 fill-black" />
-                    <p>({5})</p>
-                    <p className="text-base">{5} ratings</p>
+                    <p>({data.reviewRating})</p>
+                    <p className="text-base">{data.reviewCount} ratings</p>
                   </div>
                 </div>
 
@@ -142,8 +159,14 @@ const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                       <div className="font-medium">
                         {stars} {stars === 1 ? "star" : "stars"}
                       </div>
-                      <Progress value={stars} max={5} className="h-[1lh]" />
-                      <div className="font-medium">{stars / 100}%</div>
+                      <Progress
+                        value={data.ratingDistribution[stars]}
+                        max={5}
+                        className="h-[1lh]"
+                      />
+                      <div className="font-medium">
+                        {data.ratingDistribution[stars]}%
+                      </div>
                     </Fragment>
                   ))}
                 </div>
