@@ -15,13 +15,18 @@ export const productsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const headers = await getHeaders();
       const session = await ctx.db.auth({ headers });
+
       const product = await ctx.db.findByID({
         collection: "products",
         id: input.id,
         depth: 2, //default also 2  -> product.image , product.tenant , product.tenant.image
+        select : {
+          content : false
+        }
       });
 
       let isPurchased = false;
+      
       if (session.user) {
         const ordersData = await ctx.db.find({
           collection: "orders",
@@ -191,6 +196,9 @@ export const productsRouter = createTRPCRouter({
         sort,
         page: input.cursor,
         limit: input.limit,
+        select : {
+          content : false
+        }
       });
 
       const dataWithSummarizedReviews = await Promise.all(
