@@ -14,18 +14,13 @@ export const LibraryView = () => {
       </nav>
       <header className="bg-[#F4F4F4] py-8 border-b">
         <div className="max-w-(--breakpoint-xl) mx-auto lg:px-12 flex flex-col gap-y-4">
-            <h1 className="text-[40px] font-medium">
-                Library
-            </h1>
-            <p className="font-medium">
-                Your purchases and reviews
-            </p>
+          <h1 className="text-[40px] font-medium">Library</h1>
+          <p className="font-medium">Your purchases and reviews</p>
         </div>
       </header>
       <section className="max-w-(--breakpoint-xl) mx-auto lg:px-12 flex flex-col py-10">
-        <Suspense fallback={<ProductListSkeleton/>}>
-
-        <ProductList/>
+        <Suspense fallback={<ProductListSkeleton />}>
+          <ProductList />
         </Suspense>
       </section>
     </div>
