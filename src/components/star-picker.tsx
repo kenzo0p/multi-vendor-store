@@ -5,7 +5,7 @@ import { StarIcon } from "lucide-react";
 import { useState } from "react";
 
 interface StarPickerProps {
-  value: number;
+  value?: number;
   onChange?: (value: number) => void;
   disabled?: boolean;
   className?: string;
@@ -45,7 +45,7 @@ export const StarPicker = ({
           <StarIcon
             className={cn(
               "size-5",
-              (hoverValue || value)  >= star
+              (hoverValue || value)!  >= star
                 ? "fill-black stroke-black"
                 : "stroke-black"
             )}

@@ -1,19 +1,20 @@
 "use client";
 
-import { StarRating } from "@/components/star-rating";
-import { Button } from "@/components/ui/button";
-import dynamic from "next/dynamic";
-import { Progress } from "@/components/ui/progress";
-import { formatCurrency, generateTenantUrl } from "@/lib/utils";
-import { useTRPC } from "@/trpc/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { CheckCheckIcon, LinkIcon, StarIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { Fragment, useState } from "react";
+import { useTRPC } from "@/trpc/client";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import Image from "next/image";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+import { CheckCheckIcon, LinkIcon, StarIcon } from "lucide-react";
 import { toast } from "sonner";
-// import { CartButton } from "../components/cart-button";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { StarRating } from "@/components/star-rating";
+import { formatCurrency, generateTenantUrl } from "@/lib/utils";
 
+// import { CartButton } from "../components/cart-button";
 //Now I dont have worry about the hydration errors as now its client side not ssr
 const CartButton = dynamic(
   () => import("../components/cart-button").then((mod) => mod.CartButton),
@@ -101,7 +102,7 @@ const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
 
             <div className="p-6">
               {data.description ? (
-                <p>{data.description}</p>
+                <RichText data={data.description} />
               ) : (
                 <p className="font-medium text-muted-foreground italic">
                   No Descroption Provided
@@ -180,3 +181,20 @@ const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
 };
 
 export default ProductView;
+
+export const ProductViewSkeleton = () => {
+  return (
+    <div className="px-4 lg:px-12 py-10">
+      <div className="border rounded-sm bg-white overflow-hidden">
+        <div className="relative aspect-[3.9] border-b">
+          <Image
+            src={"/placeholder.png"}
+            alt={"placeholder"}
+            fill
+            className="object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};

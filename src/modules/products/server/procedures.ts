@@ -5,6 +5,7 @@ import { z } from "zod";
 import { sortValue } from "../search-params";
 import { DEFAULT_LIMIT } from "@/constants";
 import { headers as getHeaders } from "next/headers";
+import { TRPCError } from "@trpc/server";
 export const productsRouter = createTRPCRouter({
   getOne: baseProcedure
     .input(
@@ -20,13 +21,20 @@ export const productsRouter = createTRPCRouter({
         collection: "products",
         id: input.id,
         depth: 2, //default also 2  -> product.image , product.tenant , product.tenant.image
-        select : {
-          content : false
-        }
+        select: {
+          content: false,
+        },
       });
 
+      if (product.isArchived) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
+
       let isPurchased = false;
-      
+
       if (session.user) {
         const ordersData = await ctx.db.find({
           collection: "orders",
@@ -121,7 +129,11 @@ export const productsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const where: Where = {};
+      const where: Where = {
+        isArchived: {
+          not_equals: true,
+        },
+      };
       let sort: Sort = "-createdAt";
       if (input.sort === "trending") {
         sort = "+createdAt";
@@ -150,6 +162,13 @@ export const productsRouter = createTRPCRouter({
       if (input.tenantSlug) {
         where["tenant.slug"] = {
           equals: input.tenantSlug,
+        };
+      } else {
+        //if we are loading products for public storefront (no tenant slug)
+        //Make sure to not load products set to "isPrivate : true" (using reverser not_equals logic)
+        //These products are exclusively private to tenant Store
+        where["isPrivate"] = {
+          not_equals: true,
         };
       }
 
@@ -196,9 +215,9 @@ export const productsRouter = createTRPCRouter({
         sort,
         page: input.cursor,
         limit: input.limit,
-        select : {
-          content : false
-        }
+        select: {
+          content: false,
+        },
       });
 
       const dataWithSummarizedReviews = await Promise.all(

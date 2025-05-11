@@ -1,5 +1,6 @@
 import { isSuperAdmin } from "@/lib/access";
 import { Tenant } from "@/payload-types";
+import { lexicalEditor, UploadFeature } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig } from "payload";
 export const Products: CollectionConfig = {
   slug: "products",
@@ -9,10 +10,11 @@ export const Products: CollectionConfig = {
       const tenant = req.user?.tenants?.[0]?.tenant as Tenant;
       return Boolean(tenant?.stripeDetailsSubmited);
     },
+    delete: ({ req }) => isSuperAdmin(req.user),
   },
   admin: {
     useAsTitle: "name",
-    description : "You must verify account before creatng product"
+    description: "You must verify account before creatng product",
   },
   fields: [
     {
@@ -22,8 +24,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: "description",
-      // TODO: Change to richtext
-      type: "text",
+      type: "richText",
       required: true,
     },
     {
@@ -59,13 +60,31 @@ export const Products: CollectionConfig = {
       defaultValue: "30-day",
     },
     {
-      name : "content",
-      //TODO : Change to Rich text
-      type: "textarea",
-      admin : {
-        description : "Protected content only visible to customers after purchase. Add product documentation downloadable files, getting started guides, and bonus materials. Supports Markdown formatting"
-      }
-
-    }
+      name: "content",
+      type: "richText",
+      admin: {
+        description:
+          "Protected content only visible to customers after purchase. Add product documentation downloadable files, getting started guides, and bonus materials. Supports Markdown formatting",
+      },
+    },
+    {
+      name: "isArchived",
+      label: "Archive",
+      defaultValue: false,
+      type: "checkbox",
+      admin: {
+        description: "If checked, this product will be archived",
+      },
+    },
+    {
+      name: "isPrivate",
+      label: "private",
+      defaultValue: false,
+      type: "checkbox",
+      admin: {
+        description:
+          "If checked, this product will not be shown on the public storefront",
+      },
+    },
   ],
 };
