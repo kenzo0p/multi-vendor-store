@@ -9,7 +9,7 @@ interface Props {
   params: Promise<{ subCategory: string }>;
   searchParams: Promise<SearchParams>;
 }
-
+export const dynamic = "force-dynamic";
 const page = async ({ params, searchParams }: Props) => {
   const { subCategory } = await params;
   const filters = await loadProductFilters(searchParams);
