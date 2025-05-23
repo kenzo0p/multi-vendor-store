@@ -8,7 +8,7 @@ export function generateTenantUrl(tenantSlug: string) {
 
   //subdomain part 
   const isDevelopment = process.env.NODE_ENV === "development";
-  const isSubdomainRoutingEnables = Boolean(process.env.NEXT_PUBLIC_ENABLE_SUBDOMAIN_ROUTING!)
+  const isSubdomainRoutingEnables = process.env.NEXT_PUBLIC_ENABLE_SUBDOMAIN_ROUTING === "true";
   
   //development or subdomain disables routing
   if (isDevelopment || !isSubdomainRoutingEnables) {
