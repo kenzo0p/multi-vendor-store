@@ -9,7 +9,8 @@
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "db:fresh": "payload migrate:fresh",
-    "db:seed": "pnpm exec tsx src/seed.ts"
+    "db:seed": "pnpm exec tsx src/seed.ts",
+    "generate:importmap": "payload generate:importmap"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
